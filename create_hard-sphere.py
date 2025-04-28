@@ -27,11 +27,6 @@ inpcrd = app.AmberInpcrdFile("structures/CB8-Guest-sol.rst7")
 guest = [
     atom.index for atom in prmtop.topology.atoms() if atom.residue.name == guest_resname
 ]
-host_com = [
-    atom.index
-    for atom in prmtop.topology.atoms()
-    if atom.residue.name == host_resname and atom.element.symbol == "C"
-]
 host = [
     atom.index for atom in prmtop.topology.atoms() if atom.residue.name == host_resname
 ]
@@ -39,6 +34,13 @@ solvent = [
     atom.index
     for atom in prmtop.topology.atoms()
     if atom.residue.name == solvent_resname
+]
+
+# Select Carbon atoms of CB8 to get cavity center
+host_com = [
+    atom.index
+    for atom in prmtop.topology.atoms()
+    if atom.residue.name == host_resname and atom.element.symbol == "C"
 ]
 
 # Create OpenMM System
@@ -50,7 +52,7 @@ system = prmtop.createSystem(
     rigidWater=True,
 )
 
-# Set Host mass to zero
+# Set Host mass to zero (makes CB8 host rigid throughout MD simulation)
 for atom in host:
     system.setParticleMass(atom, 0.0 * unit.dalton)
 

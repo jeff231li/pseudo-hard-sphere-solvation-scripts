@@ -115,7 +115,7 @@ def make_host_wca_dispersive(
     system.addForce(wca_dispersive)
 
 
-def add_alchemical_wca_repulsive(
+def alchemicalize_guest_wca_repulsive(
     system,
     guest,
     solvents,
