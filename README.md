@@ -1,10 +1,15 @@
 # Pseudo-hard-sphere-solvation-paper
-Repository containing setup and analysis scripts used in the paper studying the high-energy water in. This repo contains the scripts to view, model and analyze pushing cavity water out of cucurbit[8]uril (CB8) with pseudo-hard-sphere particle. This theoretical and computational study aims to resolve the existence of high-energy water in cucurbiturils that may explain the high binding free energies observed experimentally. The manuscript describing this work is available [ChemRxiv](http://chemrxiv.org/engage/chemrxiv/article-details/679a4658fa469535b9502fb8).
+Repository containing setup and analysis scripts used in the paper studying the high-energy water in. This repo contains the scripts to view, model and analyze pushing cavity water out of cucurbit[8]uril (CB8) with pseudo-hard-sphere particle. This theoretical and computational study aims to determine the existence of high-energy water in cucurbiturils, which may explain the high binding free energies observed experimentally. The manuscript describing this work is available [ChemRxiv](http://chemrxiv.org/engage/chemrxiv/article-details/679a4658fa469535b9502fb8).
 
 ## Modeling the hard-sphere particle
 A hard sphere particle has the following definition
 
-$$\Phi_{\text{hard sphere}} (r_{ij}) = \begin{cases}\infty & r_{ij} \le \sigma \\ 0 & r_{ij} > \sigma \end{cases}$$
+$$
+\Phi_{\text{hard sphere}} (r_{ij}) = \begin{cases}
+\infty & r_{ij} \le \sigma \\ 
+0 & r_{ij} > \sigma 
+\end{cases}
+$$
 
 where $\sigma$ determines the particle size and $r_{ij}$ is the interatomic distance. However, for molecular dynamics (MD) simulations, we need a functional form that is differentiable. We start with the Mie potential
 
@@ -12,21 +17,31 @@ $$\Phi_{\rm Mie} (r_{ij}) = \frac{c_{r}}{c_{r} - c_{a}}\left(\frac{c_{r}}{c_{a}}
 
 where $c_{r}$ and $c_{a}$ are the exponents of the repulsive and attractive terms. The minimum of the potential function is positioned at
 
-$$R_{\text{min}}^{\rm Mie} \sigma \left(\frac{c_{r}}{c_{a}}\right)^{\frac{1}{c_{r}-c_{a}}}$$
+$$R_{\text{min}}^{\rm Mie} = \sigma \left(\frac{c_{r}}{c_{a}}\right)^{\frac{1}{c_{r}-c_{a}}}$$
 
 The Mie potential is a generalized form of the Lennard-Jones potential when $c_{r}$ and $c_{a}$ are set as 12 and 6, respectively. To remove the attractive term from the potential, we apply a cut-and-shifted Weeks-Chandler-Anderson perturbation to the Mie Potential.
 
-$$\Phi_{\text{WCA-repulsive}}^{\rm Mie} (r_{ij}) = \begin{cases}\Phi_{\rm Mie}(r_{ij}) + \epsilon & r_{ij}\le R_{\rm min}^{\rm Mie} \\ 0 & r_{ij}>R_{\rm min}^{\text Mie}\end{cases}$$
+$$
+\Phi_{\text{WCA-repulsive}}^{\rm Mie} (r_{ij}) = \begin{cases}
+\Phi_{\rm Mie}(r_{ij}) + \epsilon & r_{ij}\le R_{\rm min}^{\rm Mie} \\ 
+0 & r_{ij}>R_{\rm min}^{\text Mie}
+\end{cases}
+$$
 
-One observation we made when we played around with the potential above is that the repulsive potential becomes softer as we increase the particle size based on the variable $\sigma$. To overcome this dilemma, we introduce a distance shift using a new variable $R_{\rm particle}$ that controls the particle size instead of $\sigma$
+One observation we made when experimenting with the potential above is that the repulsive potential becomes softer as we increase the particle size, based on the variable $\sigma$. To overcome this dilemma, we introduce a distance shift using a new variable $R_{\rm particle}$ that controls the particle size instead of $\sigma$
 
 $$r_{ij}' = r_{ij} - (R_{\rm particle} - R_{\rm min}^{\rm Mie})$$
 
 We substitute the definition above for the interatomic distance giving 
 
-$$\Phi_{\text{WCA-repulsive}}^{\rm Mie} (r_{ij}') = \begin{cases}\Phi_{\rm Mie}(r_{ij}') + \epsilon & r_{ij}\le R_{\rm min}^{\rm Mie} \\ 0 & r_{ij}>R_{\rm min}^{\text Mie}\end{cases}$$
+$$
+\Phi_{\text{WCA-repulsive}}^{\rm Mie} (r_{ij}') = \begin{cases}
+\Phi_{\rm Mie}(r_{ij}') + \epsilon & r_{ij}\le R_{\rm min}^{\rm Mie} \\ 
+0 & r_{ij}>R_{\rm min}^{\text Mie}
+\end{cases}
+$$
 
-For this study we used the following parameters:
+For this study, we used the following parameters:
 
 | Variable | Value        |
 | -------- |--------------|
@@ -58,7 +73,7 @@ wca_repulsive.setUseLongRangeCorrection(False)
 ```
 
 ## Alchemically-modified hard-sphere potential
-To estimate the hydration free energy (HFE) we apply a soft-core potential to prevent end-point catastrophe transforming the Mie potential to
+To estimate the hydration free energy (HFE), we apply a soft-core potential to prevent end-point catastrophe, transforming the Mie potential to
 
 $$\Phi_{\text{softcore}}^{\rm Mie} = \frac{c_{r}}{c_{r} - c_{a}}\left(\frac{c_{r}}{c_{a}}\right)^{\frac{c_{a}}{c_{r} - c_{a}}} \lambda\epsilon \left[\frac{1}{\left[\alpha(1-\lambda)+\left(r_{ij}/\sigma\right)^{c_{a}}\right]^{c_{r}/c_{a}}} - \frac{1}{\alpha(1-\lambda)+\left(\frac{r_{ij}}{\sigma}\right)^{c_{a}}}\right]$$
 
@@ -66,9 +81,14 @@ The location of the minimum will vary with the coupling parameter $\lambda$
 
 $$R_{\rm min}^{\text{Mie-softcore}} (\lambda) = \sigma \left[\left(\frac{c_{r}}{c_{a}}\right)^{\frac{c_{a}}{c_{r} - c_{a}}} - \alpha(1-\lambda)\right]^{1/c_{a}}$$
 
-Applying the WCA perturbation to the equation above gives us the alchemically-modified pseudo hard-sphere potential
+Applying the WCA perturbation to the equation above gives us the alchemically-modified pseudo-hard-sphere potential
 
-$$\Phi_{\text{WCA-repulsive}}^{\text{Mie-softcore}} (r_{ij}',\lambda) = \begin{cases}\Phi_{\rm Mie}^{\rm softcore}(r_{ij}',\lambda) + \lambda\epsilon & r_{ij} \le R_{\rm particle} \\ 0 & r_{ij} > R_{\rm particle}\end{cases}$$
+$$
+\Phi_{\text{WCA-repulsive}}^{\text{Mie-softcore}} (r_{ij}',\lambda) = 
+\begin{cases}\Phi_{\rm Mie}^{\rm softcore}(r_{ij}',\lambda) + \lambda\epsilon & r_{ij} \le R_{\rm particle} \\ 
+0 & r_{ij} > R_{\rm particle}
+\end{cases}
+$$
 
 The alchemically-modified pseudo-hard-sphere potential is modeled using `CustomNonbondedForce` module in OpenMM. Below is a snippet of the implementation
 
@@ -101,11 +121,16 @@ Similar to the approach for modeling the pseudo-hard-sphere potential, we use WC
 
 $$\Phi_{\rm CB8}^{\rm LJ} = 4\epsilon \left[\left(\frac{\sigma}{r_{ij}}\right)^{12} - \left(\frac{\sigma}{r_{ij}}\right)^{6}\right]$$
 
-We apply a coupling parameter $\lambda$ in a linear fashion (no softcore potential added) and a WCA perturbation, thus
+We apply a coupling parameter $\lambda$ linearly (no softcore potential added) and a WCA perturbation, thus
 
-$$\Phi_{\text{WCA-dispersive}}^{\text{CB8-LJ}} (r_{ij}, \lambda) = \begin{cases}\Phi_{\rm LJ}(r_{ij}) + \epsilon(1-\lambda) & r_{ij} \le R_{\rm min}^{\rm LJ} \\ \lambda \Phi_{\rm LJ} (r_{ij}) & r_{ij} > R_{\rm min}^{\rm LJ}\end{cases}$$
+$$
+\Phi_{\text{WCA-dispersive}}^{\text{CB8-LJ}} (r_{ij}, \lambda) = \begin{cases}
+\Phi_{\rm LJ}(r_{ij}) + \epsilon(1-\lambda) & r_{ij} \le R_{\rm min}^{\rm LJ} \\ 
+\lambda \Phi_{\rm LJ} (r_{ij}) & r_{ij} > R_{\rm min}^{\rm LJ}
+\end{cases}
+$$
 
-When $\lambda = 1$ the equation above becomes the standard LJ(12,6) potential. When $\lambda=0$, we get only repulsive interaction of the LJ potential.
+When $\lambda = 1$ the equation above becomes the standard LJ(12,6) potential. When $\lambda=0$, we get only the repulsive interaction of the LJ potential.
 
 The LJ-dispersive CB8 potential is modeled using `CustomNonbondedForce` module in OpenMM. Below is a snippet of the implementation
 
@@ -129,7 +154,7 @@ wca_dispersive.addInteractionGroup(host_atoms, solvent_atoms)
 ```
 
 ## Visualizing the particle inside CB8
-When you load the PDB file containing the CB8, pseudo-hard-sphere particle and water in VMD, the radius if the particle is not rendered properly. Representing the CB8 as licorice sticks and the particle as VDW spheres gives the following visualization
+When you load the PDB file containing the CB8, pseudo-hard-sphere particle, and water in VMD, the radius of the particle is not rendered properly (image file located in the folder [images](images)). Representing the CB8 as licorice sticks (`resname CB8`) and the particle as VDW spheres (`resname DM1`) gives the following visualization
 
 <img src="images/default_radius.png" alt="Alt Text" width="400" height="400">
 
@@ -140,22 +165,22 @@ set particle [atomselect top "resname DM1"]
 $particle set radius 5.0
 ```
 
-With the command above we get a particle with the correct radius
+With the command above, we get a particle with the correct radius
 
 <img src="images/corrected_radius.png" alt="Alt Text" width="400" height="400">
 
 ## Notes about repo
-All of the MD simulations for this study were done with OpenMM version 7.5.1. I have also tested this with version 8 to any OpenMM versions >7.5 will work.
+All MD simulations for this study were performed using OpenMM version 7.5.1. I have also tested this with version 8, and any OpenMM version greater than 7.5.1 will work.
 
 > [!Note]
-> This repo is still a work in progress, there are still many things I will add in the near future.
+This repo is still a work in progress; I will add many more things shortly.
 
-The file `hard_sphere.py` contains three Python functions that creates the different modifications for this study:
+The file `hard_sphere.py` contains three Python functions that create the different modifications for this study:
 * pseudo-hard-sphere potential: `make_guest_wca_repulsive`
 * alchemically-modified pseudo-hard-sphere potential: `alchemicalize_guest_wca_repulsive`
 * varying CB8 potential: `make_host_wca_dispersive`
 
-The file `create_hard-sphere.py` creates an System XML file containing the modified potentials after loading the AMBER files `*.prmtop` and `*.rst7` into OpenMM
+The file `create_hard-sphere.py` creates a System XML file containing the modified potentials after loading the AMBER files `*.prmtop` and `*.rst7` into OpenMM.
 
-> [!TODO] 
-> Add a script that runs the simulations (with and without umbrella sampling restraints) and the alchemical version that was used to estimate the hydration free energy.
+> [!Important] 
+I still need to add a Python script that runs the simulations (with and without umbrella sampling restraints) and the alchemical version used to estimate the hydration free energy.
