@@ -17,10 +17,10 @@ python simulate_z=15.py
 ```
 
 ## Simulation video
-Below is short video of the MD simulations for $z=0$ Angstrom.
+Below is video of the MD simulations for $z=0$ Angstrom.
 
 <video width="840" height="997" controls>
   <source src="z_initial/movie.mpg" type="video/mpg">
 </video>
 
-Below is short video of the MD simulations for $z=15$ Angstrom.
+Below is video of the MD simulations for $z=15$ Angstrom.
