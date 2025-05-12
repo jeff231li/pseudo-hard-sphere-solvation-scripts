@@ -28,7 +28,7 @@ $$
 \end{cases}
 $$
 
-One observation we made when experimenting with the potential above is that the repulsive potential becomes softer as we increase the particle size, based on the variable $\sigma$. To overcome this dilemma, we introduce a distance shift using a new variable $R_{\rm particle}$ that controls the particle size instead of $\sigma$
+One observation we made when experimenting with the potential above is that the repulsive potential becomes softer as we increase the particle size, based on the variable $\sigma$ (see Figure S1 in the [manuscript](http://chemrxiv.org/engage/chemrxiv/article-details/679a4658fa469535b9502fb8)). To overcome this dilemma, we introduce a distance shift using a new variable $R_{\rm particle}$ that controls the particle size instead of $\sigma$
 
 $$r_{ij}' = r_{ij} - (R_{\rm particle} - R_{\rm min}^{\rm Mie})$$
 
@@ -72,7 +72,7 @@ wca_repulsive.setCutoffDistance(nonbonded.getCutoffDistance())
 wca_repulsive.setUseLongRangeCorrection(False)
 ```
 
-## Alchemically-modified hard-sphere potential
+## Alchemically-modified pseudo-hard-sphere potential
 To estimate the hydration free energy (HFE), we apply a soft-core potential to prevent end-point catastrophe, transforming the Mie potential to
 
 $$\Phi_{\text{softcore}}^{\rm Mie} = \frac{c_{r}}{c_{r} - c_{a}}\left(\frac{c_{r}}{c_{a}}\right)^{\frac{c_{a}}{c_{r} - c_{a}}} \lambda\epsilon \left[\frac{1}{\left[\alpha(1-\lambda)+\left(r_{ij}/\sigma\right)^{c_{a}}\right]^{c_{r}/c_{a}}} - \frac{1}{\alpha(1-\lambda)+\left(\frac{r_{ij}}{\sigma}\right)^{c_{a}}}\right]$$
@@ -115,6 +115,7 @@ wca_repulsive.setNonbondedMethod(openmm.CustomNonbondedForce.CutoffPeriodic)
 wca_repulsive.setCutoffDistance(nonbonded.getCutoffDistance())
 wca_repulsive.setUseLongRangeCorrection(False)
 ```
+The hydration free energy obtained from the alchemically-modified pseudo-hard-sphere potential above is virtually the same as that obtained using the potential of mean force (PMF) method with umbrella sampling (US) (see Figure S2 in the [manuscript](http://chemrxiv.org/engage/chemrxiv/article-details/679a4658fa469535b9502fb8)).
 
 ## Modeling CB8 host with varying attractive LJ potential
 Similar to the approach for modeling the pseudo-hard-sphere potential, we use WCA perturbation on the LJ potential of the CB8. Given the LJ potential
@@ -169,8 +170,15 @@ With the command above, we get a particle with the correct radius
 
 <img src="images/corrected_radius.png" alt="Alt Text" width="400" height="400">
 
+## Molecular Dynamics Simulations
+There is a simple Python script that creates the system for the **CB8** model (see [Table 1](http://chemrxiv.org/engage/chemrxiv/article-details/679a4658fa469535b9502fb8) of the manuscript for the different CB8 models studied) located in the [simulation](simulation) folder and runs MD simulations at the initial and final states (i.e. $z=0$ Ang and $z=15$ Ang).
+
+> [Note] 
+I still need to add a Python script that runs the free energy simulations (steered-MD, umbrella sampling restraints) and the alchemical version used to estimate the hydration free energy.
+
+
 ## Notes about repo
-All MD simulations for this study were performed using OpenMM version 7.5.1. I have also tested this with version 8, and any OpenMM version greater than 7.5.1 will work.
+All MD simulations for this study were performed using OpenMM version 7.5.1. I have also tested this with version 8, and so any OpenMM version greater than 7.5.1 should work.
 
 > [!Note]
 This repo is still a work in progress; I will add many more things shortly.
@@ -178,9 +186,6 @@ This repo is still a work in progress; I will add many more things shortly.
 The file `hard_sphere.py` contains three Python functions that create the different modifications for this study:
 * pseudo-hard-sphere potential: `make_guest_wca_repulsive`
 * alchemically-modified pseudo-hard-sphere potential: `alchemicalize_guest_wca_repulsive`
-* varying CB8 potential: `make_host_wca_dispersive`
+* varying LJ-dispersive potential for CB8: `make_host_wca_dispersive`
 
 The file `create_hard-sphere.py` creates a System XML file containing the modified potentials after loading the AMBER files `*.prmtop` and `*.rst7` into OpenMM.
-
-> [!Important] 
-I still need to add a Python script that runs the simulations (with and without umbrella sampling restraints) and the alchemical version used to estimate the hydration free energy.

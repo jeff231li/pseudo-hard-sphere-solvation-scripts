@@ -20,7 +20,7 @@ wca_attractive = 49
 # Load Amber Files
 # ----------------------------------------------------------------------- #
 prmtop = app.AmberPrmtopFile("structures/CB8-Guest-sol.prmtop")
-inpcrd = app.AmberInpcrdFile("structures/CB8-Guest-sol.rst7")
+inpcrd = app.AmberInpcrdFile("structures/CB8-Guest-sol-z=0.rst7")
 
 # Get atom indices of different components in system
 # ----------------------------------------------------------------------- #
